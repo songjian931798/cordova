@@ -1,0 +1,15 @@
+(1)创建第一个Hybrid App(windows平台)
+	1.cordova是个什么东东？
+	了解APP混合开发的朋友对cordova一定不陌生。cordova是Apache开源的一个移动应用开发框架。它允许你用标准的web技术做跨平台的应用开发。
+这里简单的介绍一些概念，应为这不是我们的重点。
+	2.创建 Hybrid App所需要的工具
+		<1>下载git工具，用来敲我们的命令。当然，你也可以不用git,你可以使用windows的命令行来敲。不过本人还是建议下载一个git工具，
+	用起来顺手。
+		<2>下载安装Node.js,下载安装好后就可以在命令行工具里面使用 node和npm了。
+		<3>使用如下命令安装cordova模块：C:\>npm install -g cordova
+		以上安装好以后我们就可以在命令行工具里面执行我们的cordova命令了。
+	
+	3.正式进入app的创建（以下讲解的所有命令都是在git工具里面执行的）
+		<1>在你的电脑的任意位置创建一个文件夹来管理你的app项目。比如：我在桌面创建一个project文件夹。然后打开文件夹，在文件夹里面点击
+	鼠标右键选择Git Bash Here.在弹出的窗口中如下命令，即可创建一个项目。命令如下：$ cordova create my com.example.hello HelloWorld
+	

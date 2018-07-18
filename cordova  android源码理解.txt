@@ -1,0 +1,577 @@
+1.接口：
+	(1)CordovaInterface：
+		<1>void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode);
+		<2>void setActivityResultCallback(CordovaPlugin plugin);
+		<3>Activity getActivity();
+		<4>Object onMessage(String id, Object data);//当有消息发送到插件是调用
+		<5>ExecutorService getThreadPool();
+		<6>void requestPermission(CordovaPlugin plugin, int requestCode, String permission);
+		<7>void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions);
+		<8>boolean hasPermission(String permission);
+	
+	(2)CordovaWebView:
+		<1>void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences);
+		<2>boolean isInitialized();
+		<3>View getView();
+		<4>void loadUrlIntoView(String url, boolean recreatePlugins);
+		<5>void stopLoading();
+		<6>boolean canGoBack();
+		<7>void clearCache();
+		<8>void clearCache(boolean b);
+		<9>void clearHistory();
+		<10>boolean backHistory();
+		<11>void handlePause(boolean keepRunning);
+		<12>void onNewIntent(Intent intent);
+		<13>void handleResume(boolean keepRunning);
+		<14>void handleStart();
+		<15>void handleStop();
+		<16>void handleDestroy();
+		<17>void sendJavascript(String statememt);
+		<18>void showWebPage(String url, boolean openExternal, boolean clearHistory, Map<String, Object> params);
+		<19>boolean isCustomViewShowing();//Deprecated in 4.0.0
+		<20>void showCustomView(View view, CustomViewCallback callback);//Deprecated in 4.0.0
+		<21> void hideCustomView();//Deprecated in 4.0.0
+		<22>CordovaResourceApi getResourceApi();
+		<23>void setButtonPlumbedToJs(int keyCode, boolean override);
+		<24>boolean isButtonPlumbedToJs(int keyCode);
+		<25>void sendPluginResult(PluginResult cr, String callbackId);
+		<26>PluginManager getPluginManager();
+		<27>CordovaWebViewEngine getEngine();
+		<28>CordovaPreferences getPreferences();
+		<29>ICordovaCookieManager getCookieManager();
+		<30>String getUrl();
+		<31>Context getContext();
+		<32>void loadUrl(String url);
+		<33>Object postMessage(String id, Object data);
+		
+	(3).CordovaWebViewEngine:
+		<1>void init(CordovaWebView parentWebView, CordovaInterface cordova, Client client,
+              CordovaResourceApi resourceApi, PluginManager pluginManager,
+              NativeToJsMessageQueue nativeToJsMessageQueue);
+		<2>CordovaWebView getCordovaWebView();
+		<3>ICordovaCookieManager getCookieManager();
+		<4>View getView();
+		<5>void loadUrl(String url, boolean clearNavigationStack);
+		<6> void stopLoading();
+		<7>String getUrl();
+		<8>void clearCache();
+		<9>void clearHistory();
+		<10>boolean canGoBack();
+		<11>boolean goBack();
+		<12>void setPaused(boolean value);
+		<13>void destroy();
+		<14>void evaluateJavascript(String js, ValueCallback<String> callback);
+		<15>内部接口：EngineView：
+			 CordovaWebView getCordovaWebView();
+		<16>内部接口：Client：
+			Boolean onDispatchKeyEvent(KeyEvent event);
+			void clearLoadTimeoutTimer();
+			void onPageStarted(String newUrl);
+			void onReceivedError(int errorCode, String description, String failingUrl);
+			void onPageFinishedLoading(String url);
+			boolean onNavigationAttempt(String url);
+			
+	(4).ExposedJsApi:
+		<1>String exec(int bridgeSecret, String service, String action, String callbackId, String arguments)
+		<2>void setNativeToJsBridgeMode(int bridgeSecret, int value) throws IllegalAccessException;
+		<3>String retrieveJsMessages(int bridgeSecret, boolean fromOnlineEvent) throws IllegalAccessException;
+		
+	(5).ICordovaClientCertRequest:// Specifies interface for handling certificate requests.
+		<1>public void cancel();//取消请求
+		<2>public String getHost();
+		<3>public String[] getKeyTypes();
+		<4>public int getPort();
+		<5>public Principal[] getPrincipals();
+		<6>public void ignore();
+		<7>public void proceed(PrivateKey privateKey, X509Certificate[] chain);
+		
+	(6).ICordovaCookieManager:
+		<1>void setCookiesEnabled(boolean accept);
+		<2>void setCookie(final String url, final String value);
+		<3>String getCookie(final String url);
+		<4>void clearCookies();
+		<5>void flush();
+		
+	(7).ICordovaHttpAuthHandler:
+		<1>public void cancel ();
+		<2>void proceed (String username, String password);
+		
+
+2.类
+	(1).SystemCookieManager implements ICordovaCookieManager: 内嵌：WebView，CookieManager：
+		<1>public void setCookiesEnabled(boolean accept)
+		<2>public void setCookie(final String url, final String value)
+		<3>public String getCookie(final String url)
+		<4>public void clearCookies()
+		<5>public void flush()
+		
+	(2).SystemExposedJsApi implements ExposedJsApi: 内嵌:CordovaBridge:
+		<1>public String exec(int bridgeSecret, String service, String action, String callbackId, String arguments)
+		<2>public void setNativeToJsBridgeMode(int bridgeSecret, int value)
+		<3>public String retrieveJsMessages(int bridgeSecret, boolean fromOnlineEvent)
+		
+	(3).SystemWebChromeClient extends WebChromeClient:内嵌:CordovaDialogsHelper,SystemWebViewEngine,View,Context,WebChromeClient.CustomViewCallback:
+		<1>public boolean onJsAlert(WebView view, String url, String message, final JsResult result)
+		<2>public boolean onJsConfirm(WebView view, String url, String message, final JsResult result)
+		<3>public boolean onJsPrompt(WebView view, String origin, String message, String defaultValue, final JsPromptResult result)
+		<4>public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota, long estimatedSize,
+            long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
+		<5>public void onConsoleMessage(String message, int lineNumber, String sourceID)
+		<6>public boolean onConsoleMessage(ConsoleMessage consoleMessage)
+		<7>public void onGeolocationPermissionsShowPrompt(String origin, Callback callback)
+		<8>public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback)
+		<9>public void onHideCustomView()
+		<10>public View getVideoLoadingProgressView()
+		<11>public void openFileChooser(ValueCallback<Uri> uploadMsg)
+		<12>public void openFileChooser( ValueCallback<Uri> uploadMsg, String acceptType )
+		<13>public void openFileChooser(final ValueCallback<Uri> uploadMsg, String acceptType, String capture)
+		<14>public boolean onShowFileChooser(WebView webView, final ValueCallback<Uri[]> filePathsCallback, final WebChromeClient.FileChooserParams fileChooserParams)
+		<15>public void onPermissionRequest(final PermissionRequest request)
+		<16>public void destroyLastDialog()
+		
+	(4).SystemWebView extends WebView implements CordovaWebViewEngine.EngineView:内嵌：SystemWebViewClient，SystemWebChromeClient，SystemWebViewEngine，CordovaInterface：
+		<1>void init(SystemWebViewEngine parentEngine, CordovaInterface cordova)
+		<2>public CordovaWebView getCordovaWebView()
+		<3>public void setWebViewClient(WebViewClient client)
+		<4>public void setWebChromeClient(WebChromeClient client)
+		<5>public boolean dispatchKeyEvent(KeyEvent event)
+		
+	(5).SystemWebViewClient extends WebViewClient:内嵌：SystemWebViewEngine
+		<1>public boolean shouldOverrideUrlLoading(WebView view, String url)
+		<2>public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm)
+		<3>public void onReceivedClientCertRequest (WebView view, ClientCertRequest request)
+		<4>public void onPageStarted(WebView view, String url, Bitmap favicon)
+		<5>public void onPageFinished(WebView view, String url)
+		<6>public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
+		<7>public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error)
+		
+		<8>public void setAuthenticationToken(AuthenticationToken authenticationToken, String host, String realm)
+		<9>public AuthenticationToken removeAuthenticationToken(String host, String realm)
+		<10>public AuthenticationToken getAuthenticationToken(String host, String realm)
+		<11>public void clearAuthenticationTokens()
+		<12>public WebResourceResponse shouldInterceptRequest(WebView view, String url)
+		
+	(6)重要.SystemWebViewEngine implements CordovaWebViewEngine:内嵌：SystemWebView，SystemCookieManager，CordovaPreferences，CordovaBridge
+	CordovaWebViewEngine.Client，CordovaWebView，CordovaInterface，PluginManager，CordovaResourceApi，NativeToJsMessageQueue，BroadcastReceiver：
+		<1>public void init(CordovaWebView parentWebView, CordovaInterface cordova, CordovaWebViewEngine.Client client,
+              CordovaResourceApi resourceApi, PluginManager pluginManager,
+              NativeToJsMessageQueue nativeToJsMessageQueue)
+		<2>public CordovaWebView getCordovaWebView()
+		<3>public ICordovaCookieManager getCookieManager()
+		<4>public View getView()
+		<5>public void loadUrl(final String url, boolean clearNavigationStack)
+		<6>public String getUrl()
+		<7>public void stopLoading()
+		<8>public void clearCache()
+		<9>public void clearHistory()
+		<10>public boolean canGoBack()
+		<11>public boolean goBack()
+		<12>public void setPaused(boolean value)
+		<13>public void destroy()
+		<14>public void evaluateJavascript(String js, ValueCallback<String> callback)
+		
+	
+	
+	(7).AuthenticationToken
+		<1> public String getUserName()
+		<2>public void setUserName(String userName)
+		<3>public String getPassword()
+		<4>public void setPassword(String password)
+		
+	(8).BuildHelper
+		<1>public static Object getBuildConfigValue(Context ctx, String key)
+		
+	(9).CallbackContext:内嵌:CordovaWebView:
+		<1>public boolean isFinished()
+		<2>public boolean isChangingThreads()
+		<3>public String getCallbackId()
+		<4>public void sendPluginResult(PluginResult pluginResult)
+		<5>public void success(JSONObject message)
+		<6>public void success(String message)
+		<7>public void success(JSONArray message)
+		<8>public void success(byte[] message)
+		<9>public void success(int message)
+		<10>public void success()
+		<11>public void error(JSONObject message)
+		<12>public void error(String message)
+		<13>public void error(int message)
+		
+	(10).CallbackMap:
+		<1>public synchronized int registerCallback(CordovaPlugin receiver, int requestCode)
+		<2>public synchronized Pair<CordovaPlugin, Integer> getAndRemoveCallback(int mappedId)
+		
+	(11).Config:内嵌：ConfigXmlParser：
+		<1>public static void init(Activity action)
+		<2> public static void init()
+		<3>public static String getStartUrl()
+		<4>public static String getErrorUrl()
+		<5>public static List<PluginEntry> getPluginEntries()
+		<6> public static CordovaPreferences getPreferences()
+		<7>public static boolean isInitialized()
+		
+	(12).ConfigXmlParser:内嵌：CordovaPreferences:
+		<1>public CordovaPreferences getPreferences()
+		<2>public ArrayList<PluginEntry> getPluginEntries()
+		<3>public String getLaunchUrl()
+		<4> public void parse(Context action)
+		<5>public void parse(XmlPullParser xml)
+		<6>public void handleStartTag(XmlPullParser xml)
+		<7>public void handleEndTag(XmlPullParser xml)
+		
+	(13).CordovaActivity extends Activity:内嵌：CordovaWebView，CordovaPreferences，CordovaInterfaceImpl：
+		<1>public void loadUrl(String url)
+		<2>public void onReceivedError(final int errorCode, final String description, final String failingUrl)
+		<3>public void displayError(final String title, final String message, final String button, final boolean exit)
+		<4>public void onRequestPermissionsResult(int requestCode, String permissions[],int[] grantResults)
+		<5>public void onConfigurationChanged(Configuration newConfig)
+		<6> protected void onSaveInstanceState(Bundle outState)
+		<7>public Object onMessage(String id, Object data)
+		<8>public boolean onOptionsItemSelected(MenuItem item)
+		<9>public boolean onPrepareOptionsMenu(Menu menu)
+		<10>public boolean onCreateOptionsMenu(Menu menu)
+		<11>protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+		<12>public void startActivityForResult(Intent intent, int requestCode, Bundle options)
+		<13>public void onWindowFocusChanged(boolean hasFocus)
+		<14>public void onDestroy()
+		<15>protected void onStart()
+		<16>protected void onStop()
+		<17>protected void onResume()
+		<18>protected void onNewIntent(Intent intent)
+		<19>protected void onPause()
+		<20>protected CordovaInterfaceImpl makeCordovaInterface()
+		<21> protected CordovaWebViewEngine makeWebViewEngine()
+		<22>protected CordovaWebView makeWebView()
+		<23>protected void createViews()
+		<24>protected void loadConfig()
+		
+	(14).CordovaArgs:
+		<1>public Object get(int index)
+		<2>public boolean getBoolean(int index)
+		<3>public double getDouble(int index)
+		<4>public int getInt(int index)
+		<5>public JSONArray getJSONArray(int index)
+		<6>public JSONObject getJSONObject(int index)
+		<7>public long getLong(int index)
+		<8>public String getString(int index)
+		<9>public Object opt(int index)
+		<10>public boolean optBoolean(int index)
+		<11>public double optDouble(int index)
+		<12>public int optInt(int index)
+		<13>public JSONArray optJSONArray(int index)
+		<14>public JSONObject optJSONObject(int index)
+		<15>public long optLong(int index)
+		<16>public String optString(int index)
+		<17>public boolean isNull(int index)
+		<18>public byte[] getArrayBuffer(int index)
+		
+	(15).CordovaBridge:内嵌：PluginManager，NativeToJsMessageQueue：
+		<1>public String jsExec(int bridgeSecret, String service, String action, String callbackId, String arguments)
+		<2>public void jsSetNativeToJsBridgeMode(int bridgeSecret, int value)
+		<3>public String jsRetrieveJsMessages(int bridgeSecret, boolean fromOnlineEvent)
+		<4>void clearBridgeSecret()
+		<5>public boolean isSecretEstablished()
+		<6>int generateBridgeSecret()// Called by cordova.js to initialize the bridge.
+		<7>public void reset()
+		<8>public String promptOnJsPrompt(String origin, String message, String defaultValue)// 重要
+		
+	(16).CordovaClientCertRequest implements ICordovaClientCertRequest:内嵌:ClientCertRequest(android.webkit):
+		<1>public void cancel()
+		<2>public String getHost()
+		<3>public String[] getKeyTypes()
+		<4>public int getPort()
+		<5>public Principal[] getPrincipals()
+		<6>public void ignore()
+		<7>public void proceed(PrivateKey privateKey, X509Certificate[] chain)
+		
+	(17).CordovaDialogsHelper:内嵌：Context，AlertDialog:
+		内部接口：interface Result:
+			public void gotResult(boolean success, String value);
+			
+		<1>public void showAlert(String message, final Result result)
+		<2>public void showConfirm(String message, final Result result)
+		<3>public void showPrompt(String message, String defaultValue, final Result result)
+		<4>public void destroyLastDialog()
+		
+	(18).CordovaHttpAuthHandler implements ICordovaHttpAuthHandler:内嵌:HttpAuthHandler(android.webkit):
+		<1> public void cancel ()
+		<2>public void proceed (String username, String password)
+		
+	(19).CordovaInterfaceImpl implements CordovaInterface:内嵌：Activity，ExecutorService，PluginManager，CallbackMap，CordovaPlugin：
+		内部类：ActivityResultHolder：
+		<1>public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode)
+		<2>public void setActivityResultCallback(CordovaPlugin plugin)
+		<3>public Activity getActivity()
+		<4>public Object onMessage(String id, Object data)
+		<5>public ExecutorService getThreadPool()
+		<6>public void onCordovaInit(PluginManager pluginManager)
+		<7>public boolean onActivityResult(int requestCode, int resultCode, Intent intent)
+		<8>public void setActivityResultRequestCode(int requestCode)
+		<9>public void onSaveInstanceState(Bundle outState)
+		<10>public void restoreInstanceState(Bundle savedInstanceState)
+		<11>public void onRequestPermissionResult(int requestCode, String[] permissions,int[] grantResults)
+		<12>public void requestPermission(CordovaPlugin plugin, int requestCode, String permission)
+		<13>public void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions)
+		<14>public boolean hasPermission(String permission)
+		
+	(20).CordovaPlugin:内嵌：CordovaWebView，CordovaPreferences，CordovaInterface：
+		<1>public final void privateInitialize(String serviceName, CordovaInterface cordova, 
+			CordovaWebView webView, CordovaPreferences preferences)// Call this after constructing to initialize the plugin
+		<2>public void initialize(CordovaInterface cordova, CordovaWebView webView) //Called after plugin construction and fields have been initialized.
+		<3>protected void pluginInitialize() //Called after plugin construction and fields have been initialized
+		<4>public String getServiceName()// Returns the plugin's service name
+		<5>public boolean execute(String action, String rawArgs, CallbackContext callbackContext)
+		<6>public boolean execute(String action, JSONArray args, CallbackContext callbackContext)
+		<7>public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext)
+		<8>public void onPause(boolean multitasking)
+		<9>public void onResume(boolean multitasking)
+		<10>public void onStart()
+		<11>public void onStop()
+		<12>public void onNewIntent(Intent intent)
+		<13>public void onDestroy()
+		<14>public Bundle onSaveInstanceState()
+		<15>public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext)
+		<16>public Object onMessage(String id, Object data)// Called when a message is sent to plugin.
+		<17>public void onActivityResult(int requestCode, int resultCode, Intent intent)
+		<18>public Boolean shouldAllowNavigation(String url)
+		<19>public Boolean shouldAllowBridgeAccess(String url)// 最好不要动这个
+		<20>public Boolean shouldOpenExternalUrl(String url)
+		<21>public boolean onOverrideUrlLoading(String url)
+		<22>public boolean onOverrideUrlLoading(String url)
+		<23>public Uri remapUri(Uri uri)
+		<24>public CordovaResourceApi.OpenForReadResult handleOpenForRead(Uri uri)
+		<25>protected Uri toPluginUri(Uri origUri)
+		<26>protected Uri fromPluginUri(Uri pluginUri)
+		<27>public void onReset()
+		<28>public boolean onReceivedHttpAuthRequest(CordovaWebView view, ICordovaHttpAuthHandler handler, String host, String realm)
+		<29>public boolean onReceivedClientCertRequest(CordovaWebView view, ICordovaClientCertRequest request)
+		<30>public void onConfigurationChanged(Configuration newConfig)
+		<31>public void requestPermissions(int requestCode) //Called by the Plugin Manager when we need to actually request permissions
+		<32>public boolean hasPermisssion()
+		<33>public void onRequestPermissionResult(int requestCode, String[] permissions,int[] grantResults)
+		
+	(21).CordovaPreferences:
+		<1>public void set(String name, String value)
+		<2>public void set(String name, boolean value)
+		<3>public void set(String name, int value)
+		<4>public void set(String name, double value)
+		<5>public Map<String, String> getAll()
+		<6>public boolean getBoolean(String name, boolean defaultValue)
+		<7>public boolean contains(String name)
+		<8>public int getInteger(String name, int defaultValue)
+		<9> public double getDouble(String name, double defaultValue)
+		<10>public String getString(String name, String defaultValue)
+		
+	(22).CordovaResourceApi:内嵌:PluginManager:
+		静态内部类：OpenForReadResult
+		
+		<1>public void setThreadCheckingEnabled(boolean value)
+		<2>public boolean isThreadCheckingEnabled()
+		<3>public static int getUriType(Uri uri)
+		<4>public Uri remapUri(Uri uri)
+		<5>public String remapPath(String path)
+		<6>public File mapUriToFile(Uri uri)
+		<7>public String getMimeType(Uri uri)
+		<8>public OpenForReadResult openForRead(Uri uri)
+		<9>public OpenForReadResult openForRead(Uri uri, boolean skipThreadCheck)
+		<10>public OutputStream openOutputStream(Uri uri)
+		<11>public OutputStream openOutputStream(Uri uri, boolean append)
+		<12>public HttpURLConnection createHttpConnection(Uri uri)
+		<13>public void copyResource(OpenForReadResult input, OutputStream outputStream)
+		<14>public void copyResource(Uri sourceUri, OutputStream outputStream)
+		<15>public void copyResource(Uri sourceUri, Uri dstUri)//Added in 3.5.0
+		
+	(23).CordovaWebViewImpl implements CordovaWebView:内嵌：PluginManager,CordovaWebViewEngine,CordovaInterface,
+		CordovaResourceApi,CordovaPreferences,CoreAndroid,NativeToJsMessageQueue:
+		
+		内部类：EngineClient implements CordovaWebViewEngine.Client：
+			<1>public void clearLoadTimeoutTimer()
+			<2>public void onPageStarted(String newUrl)
+			<3>public void onReceivedError(int errorCode, String description, String failingUrl)
+			<4>public void onPageFinishedLoading(String url)
+			<5>public Boolean onDispatchKeyEvent(KeyEvent event)
+			<6>public boolean onNavigationAttempt(String url)
+			
+		<1>public static CordovaWebViewEngine createEngine(Context context, CordovaPreferences preferences)
+		<2>public void init(CordovaInterface cordova)
+		<3>public void init(CordovaInterface cordova, List<PluginEntry> pluginEntries, CordovaPreferences preferences)
+		<4>public boolean isInitialized()
+		<5>public void loadUrlIntoView(final String url, boolean recreatePlugins)
+		<6>public void loadUrl(String url)
+		<7>public void showWebPage(String url, boolean openExternal, boolean clearHistory, Map<String, Object> params)
+		<8>public void showCustomView(View view, WebChromeClient.CustomViewCallback callback)
+		<9>public void hideCustomView()
+		<10>public boolean isCustomViewShowing()
+		<11>public void sendJavascript(String statement)
+		<12>public void sendPluginResult(PluginResult cr, String callbackId)
+		<13>public PluginManager getPluginManager()
+		<14>public CordovaPreferences getPreferences()
+		<15>public ICordovaCookieManager getCookieManager()
+		<16>public CordovaResourceApi getResourceApi()
+		<17>public CordovaWebViewEngine getEngine()
+		<18>public View getView()
+		<19>public Context getContext()
+		<20>public void setButtonPlumbedToJs(int keyCode, boolean override)
+		<21>public boolean isButtonPlumbedToJs(int keyCode)
+		<22>public Object postMessage(String id, Object data)
+		<23>public String getUrl()
+		<24>public void stopLoading()
+		<25>public boolean canGoBack()
+		<26>public void clearCache()
+		<27>public void clearCache(boolean b)
+		<28>public void clearHistory()
+		<29>public boolean backHistory()
+		//LifeCycle methods
+		<30>public void onNewIntent(Intent intent)
+		<31>public void handlePause(boolean keepRunning)
+		<32> public void handleResume(boolean keepRunning)
+		<33>public void handleStart()
+		<34>public void handleStop()
+		<35>public void handleDestroy()
+		
+	(24).CoreAndroid extends CordovaPlugin:内嵌：CallbackContext，PluginResult：
+		<1>public void fireJavascriptEvent(String action)// Send an event to be fired on the Javascript side
+		<2>public void pluginInitialize()
+		<3>public boolean execute(String action, JSONArray args, CallbackContext callbackContext)//Executes the request and returns PluginResult
+		//LOCAL METHODS
+		<4>public void clearCache()
+		<5> public void loadUrl(String url, JSONObject props)
+		<6>public void clearHistory()
+		<7>public void backHistory()
+		<8>public void overrideBackbutton(boolean override)//WARNING: Back Button Default Behavior will be overridden.  The backbutton event will be fired!
+		<9>public void overrideButton(String button, boolean override)//Override the default behavior of the Android volume buttons
+		//If overridden, when the volume button is pressed, the "volume[up|down]button" JavaScript event will be fired
+		<10>public boolean isBackbuttonOverridden()
+		<11>public void exitApp()//Exit the Android application.
+		<12>public void onDestroy()//Unregister the receiver
+		<13>public void sendResumeEvent(PluginResult resumeEvent)
+		<14>public static Object getBuildConfigValue(Context ctx, String key)//This needs to be implemented if you wish to use the Camera Plugin or other plugins that read the Build Configuration.
+		
+	(25).LOG:
+		<1>public static void setLogLevel(int logLevel)
+		<2>public static void setLogLevel(String logLevel)
+		<3>public static void setLogLevel(String logLevel)
+		<4>public static void v(String tag, String s)
+		<5>public static void d(String tag, String s)
+		<6>public static void i(String tag, String s)
+		<7>public static void w(String tag, String s)
+		<8>public static void e(String tag, String s)
+		<9>public static void v(String tag, String s, Throwable e)
+		<10> public static void d(String tag, String s, Throwable e)
+		<11>public static void i(String tag, String s, Throwable e)
+		<12>public static void w(String tag, Throwable e)
+		<13>public static void w(String tag, String s, Throwable e)
+		<14>public static void e(String tag, String s, Throwable e)
+		<15>public static void v(String tag, String s, Object... args)
+		<16>public static void d(String tag, String s, Object... args)
+		<17>public static void i(String tag, String s, Object... args)
+		<18>public static void w(String tag, String s, Object... args)
+		<19>public static void e(String tag, String s, Object... args)
+		
+	(26).NativeToJsMessageQueue:
+	
+		抽象的静态内部类:BridgeMode:
+			<1>public abstract void onNativeToJsMessageAvailable(NativeToJsMessageQueue queue)
+			<2>public void notifyOfFlush(NativeToJsMessageQueue queue, boolean fromOnlineEvent)
+			<3>public void reset()
+			
+		静态内部类:NoOpBridgeMode extends BridgeMode:
+			<1>public void onNativeToJsMessageAvailable(NativeToJsMessageQueue queue)
+		
+		静态内部类:LoadUrlBridgeMode extends BridgeMode:内嵌：CordovaWebViewEngine，CordovaInterface：
+			<1>public LoadUrlBridgeMode(CordovaWebViewEngine engine, CordovaInterface cordova)
+			<2>public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue)
+			
+		静态内部类:OnlineEventsBridgeMode extends BridgeMode:
+		
+			内部接口：OnlineEventsBridgeModeDelegate：
+				<1>void setNetworkAvailable(boolean value);
+				<2>void runOnUiThread(Runnable r)
+				
+			<1> public void reset()
+			<2>public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue)
+			<3>public void notifyOfFlush(final NativeToJsMessageQueue queue, boolean fromOnlineEvent)
+			
+		静态内部类:EvalBridgeMode extends BridgeMode:内嵌：CordovaWebViewEngine，CordovaInterface：
+			<1>public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue)
+			
+		私有静态内部类:JsMessage：内嵌：PluginResult：
+			<1>static int calculateEncodedLengthHelper(PluginResult pluginResult)
+			<2>int calculateEncodedLength()
+			<3>static void encodeAsMessageHelper(StringBuilder sb, PluginResult pluginResult)
+			<4>void encodeAsMessage(StringBuilder sb)
+			<5>void buildJsMessage(StringBuilder sb)
+			<6>void encodeAsJsMessage(StringBuilder sb)
+			
+		<1>public void addBridgeMode(BridgeMode bridgeMode)
+		<2>public boolean isBridgeEnabled()
+		<3>public boolean isEmpty() 
+		<4>public void setBridgeMode(int value) ///Changes the bridge mode
+		<5>public void reset() //Clears all messages and resets to the default bridge mode.
+		<6>public String popAndEncode(boolean fromOnlineEvent)// ?
+		<7> public String popAndEncodeAsJs()
+		<8>public void addJavaScript(String statement)//Add a JavaScript statement to the list.
+		<9>public void addPluginResult(PluginResult result, String callbackId)
+		<10>public void setPaused(boolean value)
+		
+	(27).PermissionHelper:
+		<1>public static void requestPermission(CordovaPlugin plugin, int requestCode, String permission)//be built with cordova-android 5.0.0+
+		<2>public static void requestPermissions(CordovaPlugin plugin, int requestCode, String[] permissions)//be built with cordova-android 5.0.0+
+		<3>public static boolean hasPermission(CordovaPlugin plugin, String permission)//be built with cordova-android 5.0.0+
+		<4>private static void deliverPermissionResult(CordovaPlugin plugin, int requestCode, String[] permissions)
+			
+	(28).PluginEntry:这个类有意思
+	
+	(29).PluginManager:内嵌：CordovaInterface，CordovaWebView，CordovaPlugin：
+		<1>public void setPluginEntries(Collection<PluginEntry> pluginEntries)
+		<2>public void init()
+		<3>public void exec(final String service, final String action, final String callbackId, final String rawArgs)
+		<4>public CordovaPlugin getPlugin(String service)//Get the plugin object that implements the service.
+		<5>public void addService(String service, String className)//Add a plugin class that implements a service to the service entry table.
+		<6>public void addService(PluginEntry entry)//dd a plugin class that implements a service to the service entry table.
+		<7>public void onPause(boolean multitasking)
+		<8>public boolean onReceivedHttpAuthRequest(CordovaWebView view, ICordovaHttpAuthHandler handler, String host, String realm)
+		<9>public boolean onReceivedClientCertRequest(CordovaWebView view, ICordovaClientCertRequest request)
+		<10>public void onResume(boolean multitasking)
+		<11>public void onStart()
+		<12>public void onStop()
+		<13>public void onDestroy()
+		<14>public Object postMessage(String id, Object data)//Send a message to all plugins.
+		<15> public void onNewIntent(Intent intent)
+		<16>public boolean shouldAllowRequest(String url)// Called when the webview is going to request an external resource.
+		<17>public boolean shouldAllowNavigation(String url)//Called when the webview is going to change the URL of the loaded content.
+		<18>public boolean shouldAllowBridgeAccess(String url)//Called when the webview is requesting the exec() bridge be enabled.
+		<19> public Boolean shouldOpenExternalUrl(String url)//Called when the webview is going not going to navigate, but may launch an Intent for an URL.
+		<20>public boolean onOverrideUrlLoading(String url)//Called when the URL of the webview changes.
+		<21>public void onReset()//Called when the app navigates or refreshes
+		<22>Uri remapUri(Uri uri)
+		<23>public void onConfigurationChanged(Configuration newConfig)//Called by the system when the device configuration changes while your activity is running.
+		<24>public Bundle onSaveInstanceState()
+		
+	(30).PluginResult:这个类有10个构造方法
+		枚举类：public enum Status{
+			NO_RESULT,OK,CLASS_NOT_FOUND_EXCEPTION,ILLEGAL_ACCESS_EXCEPTION,INSTANTIATION_EXCEPTION,MALFORMED_URL_EXCEPTION,
+			IO_EXCEPTION,INVALID_ACTION,JSON_EXCEPTION,ERROR
+		}
+		<1>public void setKeepCallback(boolean b)
+		<2>public int getStatus()
+		<3>public int getMessageType()
+		<4>public String getMessage()
+		<5>public int getMultipartMessagesSize()
+		<6>public PluginResult getMultipartMessage(int index)
+		<7>public String getStrMessage()
+		<8>public boolean getKeepCallback()
+		<9>public String getJSONString()
+		<10>public String toCallbackString(String callbackId)
+		<11>public String toSuccessCallbackString(String callbackId)
+		<12>public String toErrorCallbackString(String callbackId)
+		
+	(31).ResumeCallback extends CallbackContext:内嵌：PluginManager:
+		<1>public void sendPluginResult(PluginResult pluginResult)
+	
+	(32).Whitelist:
+		私有静态内部类:private static class URLPattern:
+			<1>public URLPattern(String scheme, String host, String port, String path)
+			<2>public boolean matches(Uri uri)
+			
+		<1>public void addWhiteListEntry(String origin, boolean subdomains)
+		<2>public boolean isUrlWhiteListed(String uri)
